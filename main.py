@@ -13,6 +13,11 @@ import asyncio
 #creating the bot
 bot = commands.Bot(command_prefix="s!")
 
+#getting the token
+with open("config.json") as c:
+    config = json.load(c)
+    token = config["token"]
+
 #when the bot goes online
 @bot.event
 async def on_ready():
