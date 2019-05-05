@@ -31,30 +31,50 @@ def xmlToDict(link):
     #converting code to a dictionary
     return xmltodict.parse(xmlCode.content)
 
+def articleEmbed(headline, link, upDate):
+    #creating the actual embed
+    articleEmbed = discord.Embed(
+        title = headline,
+        description = link,
+        colour = discord.Colour.green()
+    )
+
+    #adding extra details to the embed
+    articleEmbed.add_field(name="Last Updated", value=upDate)
+
+    return articleEmbed
+
 #calls the articles json file
 async def sendArticle():
-    guild = bot.get_guild(565972212700676116)
-    channel = discord.utils.get(guild.channels, name='general')
+    guild = bot.get_guild(434323921303633930)
+    channel = discord.utils.get(guild.channels, name='newsbot')
 
     while True:
         #writes the latest RSS feed to the json file
         with open("whatever.json", 'w') as f:
-            json.dump(xmlToDict("https://www.google.com/alerts/feeds/17847585705873020513/17049360293039209726"), f)
+            json.dump(xmlToDict("https://seekingalpha.com/market_currents.xml"), f)
     
         #reads the file
         with open("whatever.json") as f2:
             niceFile = json.load(f2)
-            articles = niceFile["feed"]["entry"]
+            articles = niceFile["rss"]["channel"]["item"]
         #reads usedArticles file
         with open("usedArticles.json") as f3:
             usedArticles = json.load(f3)
 
         #sends the message
-        i = 1
+        i = 0
         for article in articles:
             if article not in usedArticles:
                 usedArticles.append(article)
-                await channel.send(article['link']['@href'])
+
+                #setting variables for the embed
+                headline = article["title"]
+                link = article['link']
+                upDate = article["pubDate"]
+
+                #sending the embed
+                await channel.send(embed=articleEmbed(headline, link, upDate))
             i+=1
     
         #rewrites usedArticles
