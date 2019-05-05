@@ -83,4 +83,4 @@ async def sendArticle():
 
         await asyncio.sleep(60*30)
 
-bot.run("NTc0MDQ3NDk4MzAyMjU5MjAx.XMztaQ.3SKXpsTCwHeKq4dpP6jQmkduy3M")
+bot.run(token)
