@@ -9,6 +9,7 @@ import requests
 import xmltodict
 import json
 import asyncio
+import aiohttp
 
 #creating the bot
 bot = commands.Bot(command_prefix="s!")
@@ -26,15 +27,6 @@ async def on_ready():
     
     print("StockNewsBot is online!")
     await bot.change_presence(activity=discord.Game(name="MarketWatch"))
-
-#reads the code in the RSS feed and converts it to a dictionary
-def xmlToDict(link):
-    #given an XML link, it converts it to a dictionary
-    
-    #making a get request to the link
-    xmlCode = requests.get(link)
-    #converting code to a dictionary
-    return xmltodict.parse(xmlCode.content)
 
 def articleEmbed(headline, link, upDate):
     #creating the actual embed
@@ -55,9 +47,16 @@ async def sendArticle():
     channel = discord.utils.get(guild.channels, name='newsbot')
 
     while True:
+        #xmlToDict with the seekingAlpha link
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://seekingalpha.com/market_currents.xml") as r:
+                #converting code to a dictionary
+                text = await r.read()
+                xmlDict = xmltodict.parse(text)
+
         #writes the latest RSS feed to the json file
         with open("whatever.json", 'w') as f:
-            json.dump(xmlToDict("https://seekingalpha.com/market_currents.xml"), f)
+            json.dump(xmlDict, f)
     
         #reads the file
         with open("whatever.json") as f2:
